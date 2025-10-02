@@ -1,0 +1,378 @@
+/* 聊天记录管理界面样式 */
+.chat-history-view {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--bg-color, #1a1a1a);
+  color: var(--text-color, #ffffff);
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* 头部样式 */
+.history-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  border-bottom: 1px solid var(--border-color, #333);
+  background: var(--header-bg, #2a2a2a);
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.header-left h2 {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.header-right {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.btn-icon {
+  background: none;
+  border: none;
+  color: var(--text-color, #ffffff);
+  padding: 0.5rem;
+  border-radius: 0.25rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  font-size: 1rem;
+}
+
+.btn-icon:hover {
+  background: var(--hover-bg, #404040);
+}
+
+.btn-primary {
+  background: var(--primary-color, #007bff);
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 0.25rem;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background-color 0.2s;
+}
+
+.btn-primary:hover {
+  background: var(--primary-hover, #0056b3);
+}
+
+.btn-link {
+  background: none;
+  border: none;
+  color: var(--link-color, #007bff);
+  cursor: pointer;
+  text-decoration: underline;
+  font-size: 0.85rem;
+  padding: 0.25rem 0;
+}
+
+.btn-link:hover {
+  color: var(--link-hover, #0056b3);
+}
+
+/* 内容区域 */
+.history-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1rem;
+}
+
+/* 加载和错误状态 */
+.loading, .error, .empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 200px;
+  text-align: center;
+  color: var(--muted-color, #888);
+}
+
+.empty-state i {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  opacity: 0.5;
+}
+
+.error {
+  color: var(--error-color, #dc3545);
+}
+
+/* 会话列表样式 */
+.sessions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.session-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  background: var(--card-bg, #2a2a2a);
+  border-radius: 0.5rem;
+  border: 1px solid var(--border-color, #333);
+  transition: background-color 0.2s;
+}
+
+.session-item:hover {
+  background: var(--card-hover, #333);
+}
+
+.session-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.session-preview {
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+  line-height: 1.4;
+  word-break: break-word;
+}
+
+.session-meta {
+  display: flex;
+  gap: 1rem;
+  font-size: 0.85rem;
+  color: var(--muted-color, #888);
+  flex-wrap: wrap;
+}
+
+.session-persona {
+  background: var(--tag-bg, #007bff);
+  color: white;
+  padding: 0.125rem 0.5rem;
+  border-radius: 0.25rem;
+  font-size: 0.75rem;
+}
+
+.session-actions {
+  display: flex;
+  gap: 0.25rem;
+  margin-left: 1rem;
+}
+
+/* 消息列表样式 */
+.messages-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.message-item {
+  display: flex;
+  gap: 0.75rem;
+  padding: 1rem;
+  background: var(--card-bg, #2a2a2a);
+  border-radius: 0.5rem;
+  border: 1px solid var(--border-color, #333);
+}
+
+.message-item.user {
+  flex-direction: row-reverse;
+  background: var(--user-msg-bg, #1a4d3a);
+}
+
+.message-avatar {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  background: var(--avatar-bg, #404040);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.message-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.message-text {
+  line-height: 1.5;
+  margin-bottom: 0.5rem;
+  word-break: break-word;
+}
+
+.message-time {
+  font-size: 0.75rem;
+  color: var(--muted-color, #888);
+}
+
+/* 搜索界面样式 */
+.search-container {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.search-input-group {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 2rem;
+}
+
+.search-input-group input {
+  flex: 1;
+  padding: 0.75rem;
+  border: 1px solid var(--border-color, #333);
+  border-radius: 0.25rem;
+  background: var(--input-bg, #2a2a2a);
+  color: var(--text-color, #ffffff);
+  font-size: 1rem;
+}
+
+.search-input-group input:focus {
+  outline: none;
+  border-color: var(--primary-color, #007bff);
+}
+
+.search-results-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.search-result-item {
+  padding: 1rem;
+  background: var(--card-bg, #2a2a2a);
+  border-radius: 0.5rem;
+  border: 1px solid var(--border-color, #333);
+}
+
+.search-result-item.user {
+  border-left: 4px solid var(--user-color, #28a745);
+}
+
+.search-result-item.ai {
+  border-left: 4px solid var(--ai-color, #007bff);
+}
+
+.result-header {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+  font-size: 0.85rem;
+  color: var(--muted-color, #888);
+  flex-wrap: wrap;
+}
+
+.result-type {
+  font-weight: 600;
+  color: var(--text-color, #ffffff);
+}
+
+.result-persona {
+  background: var(--tag-bg, #007bff);
+  color: white;
+  padding: 0.125rem 0.5rem;
+  border-radius: 0.25rem;
+  font-size: 0.75rem;
+}
+
+.result-content {
+  line-height: 1.5;
+  margin-bottom: 0.75rem;
+  word-break: break-word;
+}
+
+.result-content mark {
+  background: var(--highlight-bg, #ffc107);
+  color: var(--highlight-text, #000);
+  padding: 0.125rem 0.25rem;
+  border-radius: 0.125rem;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .history-header {
+    padding: 0.75rem;
+  }
+  
+  .header-left h2 {
+    font-size: 1.1rem;
+  }
+  
+  .history-content {
+    padding: 0.75rem;
+  }
+  
+  .session-item {
+    padding: 0.75rem;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+  
+  .session-actions {
+    margin-left: 0;
+    align-self: flex-end;
+  }
+  
+  .session-meta {
+    gap: 0.75rem;
+  }
+  
+  .message-item {
+    padding: 0.75rem;
+  }
+  
+  .search-input-group {
+    flex-direction: column;
+  }
+  
+  .result-header {
+    gap: 0.75rem;
+  }
+}
+
+/* 浅色主题适配 */
+.light-mode .chat-history-view {
+  --bg-color: #ffffff;
+  --text-color: #333333;
+  --border-color: #e0e0e0;
+  --header-bg: #f8f9fa;
+  --card-bg: #ffffff;
+  --card-hover: #f8f9fa;
+  --hover-bg: #f0f0f0;
+  --muted-color: #666666;
+  --input-bg: #ffffff;
+  --user-msg-bg: #e8f5e8;
+  --avatar-bg: #e0e0e0;
+  --highlight-bg: #fff3cd;
+  --highlight-text: #856404;
+}
+
+/* 滚动条样式 */
+.history-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.history-content::-webkit-scrollbar-track {
+  background: var(--bg-color, #1a1a1a);
+}
+
+.history-content::-webkit-scrollbar-thumb {
+  background: var(--border-color, #333);
+  border-radius: 3px;
+}
+
+.history-content::-webkit-scrollbar-thumb:hover {
+  background: var(--muted-color, #888);
+}
