@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>AI数字人</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="chatHistory.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  
+  <!-- 富文本渲染依赖库 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+  
+  <!-- MathJax 配置 -->
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']],
+        processEscapes: true,
+        processEnvironments: true
+      },
+      options: {
+        skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+        ignoreHtmlClass: 'tex2jax_ignore',
+        processHtmlClass: 'tex2jax_process'
+      },
+      startup: {
+        ready: () => {
+          console.log('MathJax 已准备就绪');
+          MathJax.startup.defaultReady();
+        }
+      }
+    };
+  </script>
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.2/marked.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.5/purify.min.js"></script>
+  
+  <script src="config.js"></script>
+  <script src="role.js"></script>
+  <script src="modal.js"></script>
+  <script src="renderer.js"></script>
+  <script src="chatManager.js"></script>
+  <script src="chatHistory.js"></script>
+  <script src="script.js"></script>
+</head>
+<body>
+  <!-- 左侧人物头像（悬浮在背景上） -->
+  <div class="left-panel">
+    <img id="leftImage" src="./imgs/img.jpg" alt="人物">
+  </div>
+
+  <!-- 右侧聊天 -->
+  <div class="chat-panel">
+    <!-- 工具栏：左侧新对话和历史记录，右侧主题和设置 -->
+    <div class="toolbar">
+      <div class="toolbar-left">
+        <button id="newChatBtn" title="新对话" aria-label="新对话">
+          <i class="fa-solid fa-plus" aria-hidden="true"></i>
+        </button>
+        <button id="historyBtn" title="聊天记录" aria-label="聊天记录">
+          <i class="fa-solid fa-history" aria-hidden="true"></i>
+        </button>
+      </div>
+      <div class="toolbar-right">
+        <button id="themeToggleBtn" title="切换主题" aria-label="切换主题">
+          <i class="fa-solid fa-sun" aria-hidden="true"></i>
+        </button>
+        <button id="settingsBtn" title="设置" aria-label="设置">
+          <i class="fa-solid fa-gear" aria-hidden="true"></i>
+        </button>
+      </div>
+    </div>
+    <div class="messages" id="messages">
+      <!-- 消息将由JavaScript动态插入 -->
+    </div>
+
+    <!-- 返回底部按钮 -->
+    <button class="scroll-to-bottom" id="scrollToBottomBtn" title="返回底部" aria-label="返回底部">
+      <i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
+    </button>
+
+    <!-- 输入框 -->
+    <div class="input-box">
+      <input type="text" id="inputText" placeholder="输入消息...">
+      <button aria-label="发送"><i class="fa-solid fa-paper-plane"></i></button>
+    </div>
+  </div>
+</body>
+</html>
