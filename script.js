@@ -1002,6 +1002,35 @@ ${roleMessage}` : systemMessage;
             console.log('页面无滚动内容，无需滚动');
         }
     }
+
+    // 处理当前对话被删除的情况
+    async handleCurrentSessionDeleted() {
+        console.log('当前对话已被删除，清空主页面并新建对话');
+        
+        // 清空当前消息
+        this.messages = [];
+        
+        // 清空界面但保留返回底部按钮
+        const messagesContainer = document.getElementById('messages');
+        const messages = messagesContainer.querySelectorAll('.message');
+        messages.forEach(msg => msg.remove());
+        
+        // 重置返回底部按钮状态
+        this.resetScrollToBottomButton();
+        
+        // 重置发送按钮状态
+        this.updateGeneratingState(false);
+        
+        // 开始新会话（不需要确认，因为当前会话已被删除）
+        if (window.chatManager) {
+            window.chatManager.startNewSession();
+        }
+        
+        // 显示欢迎消息
+        await this.showWelcomeMessage();
+        
+        console.log('已清空主页面并开始新对话');
+    }
 }
 
 // 初始化应用

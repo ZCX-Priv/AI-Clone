@@ -311,8 +311,17 @@ class ChatHistoryUI {
     }
 
     try {
+      // 检查是否删除的是当前对话
+      const isCurrentSession = this.chatManager.getCurrentSessionId() === sessionId;
+      
       await this.chatManager.deleteSession(sessionId);
       await showSuccess('会话已删除');
+      
+      // 如果删除的是当前对话，通知主页面清空并新建对话
+      if (isCurrentSession && window.chatUIManager) {
+        console.log('删除的是当前对话，主页面将清空并新建对话');
+        await window.chatUIManager.handleCurrentSessionDeleted();
+      }
       
       // 刷新当前视图
       if (this.currentView === 'sessions') {
@@ -370,6 +379,13 @@ class ChatHistoryUI {
     try {
       await this.chatManager.clearAllMessages();
       await showSuccess('所有聊天记录已清空');
+      
+      // 清空所有记录后，主页面也要清空并新建对话
+      if (window.chatUIManager) {
+        console.log('所有聊天记录已清空，主页面将清空并新建对话');
+        await window.chatUIManager.handleCurrentSessionDeleted();
+      }
+      
       await this.showSessions();
     } catch (error) {
       console.error('清空失败:', error);
