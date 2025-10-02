@@ -149,9 +149,11 @@ class ChatUIManager {
             this.bindScrollEvents();
         }, 100);
         
-        // 页面加载完成后检测初始滚动位置
+        // 页面加载完成后检测初始滚动位置并确保滚动到底部
         setTimeout(() => {
             this.checkInitialScrollPosition();
+            // 最终确保滚动到底部
+            this.ensureScrollToBottom();
         }, 500);
     }
 
@@ -205,6 +207,12 @@ class ChatUIManager {
                     }
                     
                     console.log(`已加载 ${messages.length} 条历史消息`);
+                    
+                    // 加载历史消息后强制滚动到底部
+                    setTimeout(() => {
+                        this.forceScrollToBottom();
+                        console.log('历史消息加载完成，已滚动到底部');
+                    }, 200);
                     return;
                 }
             }
@@ -222,6 +230,12 @@ class ChatUIManager {
     async showWelcomeMessage() {
         // 添加欢迎消息（首条使用机器人头像）
         await this.addMessage('assistant', '你好！我是你的AI陪伴，有什么想聊的吗？ 😊', { robotFirst: true });
+        
+        // 显示欢迎消息后确保滚动到底部
+        setTimeout(() => {
+            this.forceScrollToBottom();
+            console.log('欢迎消息显示完成，已滚动到底部');
+        }, 100);
     }
 
     async startNewChat() {
@@ -257,6 +271,11 @@ class ChatUIManager {
         this.updateGeneratingState(false);
         
         await this.showWelcomeMessage();
+        
+        // 新对话开始后确保滚动到底部
+        setTimeout(() => {
+            this.forceScrollToBottom();
+        }, 100);
         
         console.log('已开始新对话');
     }
@@ -920,7 +939,10 @@ ${roleMessage}` : systemMessage;
         const hasScrollableContent = scrollHeight > clientHeight;
         
         if (hasScrollableContent) {
-            // 有可滚动内容，检查当前位置
+            // 有可滚动内容，首先滚动到底部（确保初始状态在底部）
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            
+            // 然后检查当前位置
             const { scrollTop } = messagesContainer;
             const isNearBottom = scrollHeight - scrollTop - clientHeight < 50;
             
@@ -931,10 +953,12 @@ ${roleMessage}` : systemMessage;
             } else {
                 // 在底部，隐藏按钮
                 scrollToBottomBtn.classList.remove('show');
+                console.log('页面加载时已在底部，隐藏返回底部按钮');
             }
         } else {
             // 没有可滚动内容，隐藏按钮
             scrollToBottomBtn.classList.remove('show');
+            console.log('页面无滚动内容，隐藏返回底部按钮');
         }
     }
 
@@ -953,6 +977,30 @@ ${roleMessage}` : systemMessage;
         setTimeout(() => {
             this.checkInitialScrollPosition();
         }, 100);
+    }
+
+    // 确保滚动到底部（用于页面初始化）
+    ensureScrollToBottom() {
+        const messagesContainer = document.getElementById('messages');
+        if (!messagesContainer) {
+            console.log('消息容器未找到，将重试');
+            setTimeout(() => {
+                this.ensureScrollToBottom();
+            }, 200);
+            return;
+        }
+
+        // 检查是否有内容
+        const { scrollHeight, clientHeight } = messagesContainer;
+        const hasContent = scrollHeight > clientHeight;
+        
+        if (hasContent) {
+            // 有内容时强制滚动到底部
+            this.forceScrollToBottom();
+            console.log('页面初始化完成，已确保滚动到底部');
+        } else {
+            console.log('页面无滚动内容，无需滚动');
+        }
     }
 }
 
