@@ -18,12 +18,39 @@ body {
   background-color: inherit; /* 保持和整体一致 */
 }
 
-.left-panel img {
+/* 媒体容器样式 */
+.left-panel .media-container {
   width: 75%;              /* 占比缩小，不是铺满 */
   aspect-ratio: 1 / 1;     /* 保持 1:1 */
-  object-fit: cover;
   border-radius: 20px;     /* 圆角 */
   box-shadow: 0 0 20px rgba(0,0,0,0.6); /* 阴影，浮在背景上 */
+  overflow: hidden;        /* 确保圆角效果 */
+  position: relative;
+}
+
+/* 图片样式 */
+.left-panel .media-container img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: inherit;  /* 继承容器的圆角 */
+}
+
+/* 视频样式 */
+.left-panel .media-container video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: inherit;  /* 继承容器的圆角 */
+}
+
+/* 向后兼容：直接在 left-panel 下的 img（如果有的话） */
+.left-panel > img {
+  width: 75%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  border-radius: 20px;
+  box-shadow: 0 0 20px rgba(0,0,0,0.6);
 }
 
 /* 右侧聊天区域 */

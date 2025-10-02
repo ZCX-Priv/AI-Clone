@@ -52,7 +52,13 @@
 <body>
   <!-- 左侧人物头像（悬浮在背景上） -->
   <div class="left-panel">
-    <img id="leftImage" src="./imgs/img.jpg" alt="人物">
+    <div id="leftMediaContainer" class="media-container">
+      <img id="leftImage" src="./imgs/img.jpg" alt="人物" style="display: block;">
+      <video id="leftVideo" autoplay muted loop playsinline style="display: none;">
+        <source src="" type="video/mp4">
+        您的浏览器不支持视频播放。
+      </video>
+    </div>
   </div>
 
   <!-- 右侧聊天 -->

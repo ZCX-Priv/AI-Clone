@@ -56,7 +56,11 @@ class Config {
                     ...parsed,
                     name: name || parsed.name || '未知角色',
                     avatar: role.avatar || './avatars/avatar.jpg',
-                    leftImage: role.leftImage || './img.jpg',
+                    // 支持新的媒体字段，同时保持向后兼容
+                    leftMedia: role.leftMedia || role.leftImage || './imgs/img.jpg',
+                    mediaType: role.mediaType || 'image',
+                    // 保持向后兼容的旧字段
+                    leftImage: role.leftImage || role.leftMedia || './imgs/img.jpg',
                     // 直接使用整个角色 md 内容作为提示词，若无则回退到 role.js 的定义
                     rolePrompt: content || role.rolePrompt || ''
                 };
@@ -655,11 +659,90 @@ ${roleMessage}` : systemMessage;
     // 根据当前人格更新左侧大图和助手头像
     updatePersonaVisuals() {
         const persona = this.config.personas[this.config.currentPersona] || {};
-        const leftImg = document.querySelector('.left-panel img');
-        if (leftImg) {
-            leftImg.src = persona.leftImage || './img.jpg';
-        }
+        this.updateLeftMedia(persona);
         this.assistantAvatar = persona.avatar || './avatars/avatar.jpg';
+    }
+
+    // 更新左侧媒体显示（图片或视频）
+    updateLeftMedia(persona) {
+        const leftImg = document.getElementById('leftImage');
+        const leftVideo = document.getElementById('leftVideo');
+        const mediaContainer = document.getElementById('leftMediaContainer');
+        
+        // 获取媒体信息，支持新旧字段
+        const mediaPath = persona.leftMedia || persona.leftImage || './imgs/img.jpg';
+        const mediaType = persona.mediaType || (window.detectMediaType ? window.detectMediaType(mediaPath) : 'image');
+        
+        if (!leftImg || !leftVideo) {
+            // 如果新的HTML结构不存在，回退到旧的方式
+            const oldImg = document.querySelector('.left-panel img');
+            if (oldImg) {
+                oldImg.src = mediaPath;
+            }
+            return;
+        }
+
+        if (mediaType === 'video') {
+            // 显示视频，隐藏图片
+            leftImg.style.display = 'none';
+            leftVideo.style.display = 'block';
+            
+            // 设置视频源
+            const source = leftVideo.querySelector('source');
+            if (source) {
+                source.src = mediaPath;
+                
+                // 根据文件扩展名设置正确的MIME类型
+                const extension = mediaPath.toLowerCase().split('.').pop();
+                switch (extension) {
+                    case 'mp4':
+                        source.type = 'video/mp4';
+                        break;
+                    case 'webm':
+                        source.type = 'video/webm';
+                        break;
+                    case 'ogg':
+                        source.type = 'video/ogg';
+                        break;
+                    default:
+                        source.type = 'video/mp4';
+                }
+            }
+            
+            // 添加视频加载错误处理
+            leftVideo.onerror = () => {
+                console.error('视频加载失败，回退到图片模式:', mediaPath);
+                // 回退到图片模式
+                leftVideo.style.display = 'none';
+                leftImg.style.display = 'block';
+                leftImg.src = persona.avatar || './imgs/img.jpg'; // 使用头像作为备用图片
+            };
+            
+            // 重新加载视频
+            leftVideo.load();
+            
+            // 尝试播放视频（静音自动播放）
+            leftVideo.play().catch(error => {
+                console.warn('视频自动播放失败:', error);
+                // 如果自动播放失败，视频仍然会显示第一帧
+            });
+            
+            console.log('已切换到视频模式:', mediaPath);
+        } else {
+            // 显示图片，隐藏视频
+            leftVideo.style.display = 'none';
+            leftImg.style.display = 'block';
+            
+            // 暂停视频（如果正在播放）
+            if (!leftVideo.paused) {
+                leftVideo.pause();
+            }
+            
+            // 设置图片源
+            leftImg.src = mediaPath;
+            
+            console.log('已切换到图片模式:', mediaPath);
+        }
     }
 
     showSettings() {
