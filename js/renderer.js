@@ -293,6 +293,16 @@ class MessageRenderer {
             const toolbar = document.createElement('div');
             toolbar.className = 'code-block-toolbar';
             
+            // 添加语言类型标签（左侧）
+            const languageLabel = document.createElement('span');
+            languageLabel.className = 'code-language-label';
+            languageLabel.textContent = codeType.toUpperCase();
+            toolbar.appendChild(languageLabel);
+            
+            // 创建按钮容器（右侧）
+            const buttonContainer = document.createElement('div');
+            buttonContainer.className = 'code-block-buttons';
+            
             // 只有HTML代码才显示预览按钮
             if (codeType === 'html') {
                 const previewBtn = document.createElement('button');
@@ -300,7 +310,7 @@ class MessageRenderer {
                 previewBtn.innerHTML = '<i class="fa-solid fa-eye"></i> 预览';
                 previewBtn.setAttribute('data-action', 'preview');
                 previewBtn.setAttribute('data-code-id', codeId);
-                toolbar.appendChild(previewBtn);
+                buttonContainer.appendChild(previewBtn);
             }
             
             // 复制按钮（所有代码都显示）
@@ -309,7 +319,10 @@ class MessageRenderer {
             copyBtn.innerHTML = '<i class="fa-solid fa-copy"></i> 复制';
             copyBtn.setAttribute('data-action', 'copy');
             copyBtn.setAttribute('data-code-id', codeId);
-            toolbar.appendChild(copyBtn);
+            buttonContainer.appendChild(copyBtn);
+            
+            // 将按钮容器添加到工具栏
+            toolbar.appendChild(buttonContainer);
             
             // 将工具栏和代码块添加到容器
             codeBlockContainer.appendChild(toolbar);

@@ -815,6 +815,7 @@ ${roleMessage}` : systemMessage;
             </div>
 
             <div class="form-actions">
+              <button id="forceRefreshBtn" class="btn-secondary">强制刷新</button>
               <button id="saveBtn" class="btn-primary">保存</button>
             </div>
         `;
@@ -832,6 +833,7 @@ ${roleMessage}` : systemMessage;
         const topPInput = settingsView.querySelector('#topPInput');
         const mathRendererSelect = settingsView.querySelector('#mathRendererSelect');
         const backBtn = settingsView.querySelector('#backBtn');
+        const forceRefreshBtn = settingsView.querySelector('#forceRefreshBtn');
 
         // 设置当前值
         providerSelect.value = this.config.providerKey;
@@ -859,6 +861,18 @@ ${roleMessage}` : systemMessage;
             document.body.removeChild(settingsView);
         };
 
+        // 强制刷新按钮
+        forceRefreshBtn.onclick = async () => {
+            const confirmed = await showConfirm(
+                '确定要强制刷新页面吗？未保存的设置将丢失。',
+                '强制刷新',
+                { confirmText: '刷新', cancelText: '取消' }
+            );
+            if (confirmed) {
+                location.reload();
+            }
+        };
+
         // 提供方变更：更新模型选项并应用默认模型
         providerSelect.onchange = () => {
             this.config.providerKey = providerSelect.value;
@@ -871,7 +885,7 @@ ${roleMessage}` : systemMessage;
         };
 
         // 保存
-        settingsView.querySelector('#saveBtn').onclick = () => {
+        settingsView.querySelector('#saveBtn').onclick = async () => {
             this.config.apiKey = settingsView.querySelector('#apiKeyInput').value.trim();
             this.config.endpoint = endpointSelect.value;
             this.config.currentPersona = personaSelect.value;
@@ -886,12 +900,13 @@ ${roleMessage}` : systemMessage;
             // 如果数学渲染器发生变化，重新加载页面以应用新的渲染器
             const oldMathRenderer = localStorage.getItem('math_renderer');
             if (oldMathRenderer && oldMathRenderer !== this.config.mathRenderer) {
-                showAlert('数学公式渲染器已更改，页面将重新加载以应用更改。', '设置已保存').then(() => {
-                    location.reload();
-                });
+                await showAlert('数学公式渲染器已更改，页面将重新加载以应用更改。', '设置已保存');
+                location.reload();
                 return;
             }
             
+            // 显示保存成功提示
+            await showSuccess('设置已成功保存！', '保存成功');
             document.body.removeChild(settingsView);
         };
     }

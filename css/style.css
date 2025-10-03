@@ -461,19 +461,32 @@ body.light-mode .input-box button:disabled {
   padding: 12px 14px;
   border-bottom: 1px solid #333;
   background: #1f1f1f;
-  font-size: 16px;
+  font-size: 1.2rem;
+  font-weight: 600;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   flex-shrink: 0;
   transition: background-color 0.3s, border-color 0.3s;
 }
 
+.settings-header span {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
 #settingsView #backBtn {
+  background: none;
   border: none;
-  background: transparent;
   color: #fff;
+  padding: 0.5rem;
+  border-radius: 0.25rem;
   cursor: pointer;
-  font-size: 22px;
-  line-height: 1;
-  padding: 0 5px;
+  transition: background-color 0.2s;
+  font-size: 1rem;
+}
+
+#settingsView #backBtn:hover {
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .settings-content {
@@ -573,7 +586,9 @@ body.light-mode .input-box button:disabled {
 
 .settings-content .form-actions {
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
   margin-top: 24px;
 }
 
@@ -589,6 +604,31 @@ body.light-mode .input-box button:disabled {
 }
 .settings-content .btn-primary:hover {
   background: #3a78c4;
+}
+
+.settings-content .btn-secondary {
+  padding: 10px 24px;
+  border: 1px solid #6c757d;
+  border-radius: 6px;
+  background: transparent;
+  color: #6c757d;
+  cursor: pointer;
+  font-size: 15px;
+  transition: all 0.3s;
+}
+.settings-content .btn-secondary:hover {
+  background: #6c757d;
+  color: #fff;
+}
+
+/* 明亮模式下的按钮样式 */
+body.light-mode .settings-content .btn-secondary {
+  color: #6c757d;
+  border-color: #6c757d;
+}
+body.light-mode .settings-content .btn-secondary:hover {
+  background: #6c757d;
+  color: #fff;
 }
 
 
@@ -619,7 +659,11 @@ body.light-mode .settings-header {
 }
 
 body.light-mode #settingsView #backBtn {
-  color: #111;
+  color: #333;
+}
+
+body.light-mode #settingsView #backBtn:hover {
+  background: rgba(0, 0, 0, 0.1);
 }
 
 body.light-mode .settings-content label {
@@ -894,12 +938,29 @@ body.light-mode .rich-content hr {
 
 .code-block-toolbar {
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
   align-items: center;
-  gap: 8px;
   background-color: #333;
   padding: 8px 12px;
   border-bottom: 1px solid #444;
+}
+
+.code-language-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #4a90e2;
+  background-color: rgba(74, 144, 226, 0.1);
+  padding: 4px 8px;
+  border-radius: 4px;
+  border: 1px solid rgba(74, 144, 226, 0.3);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.code-block-buttons {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .code-block-btn {
@@ -964,6 +1025,12 @@ body.light-mode .code-block-container {
 body.light-mode .code-block-toolbar {
   background-color: #f8f9fa;
   border-bottom-color: #e0e0e0;
+}
+
+body.light-mode .code-language-label {
+  color: #007bff;
+  background-color: rgba(0, 123, 255, 0.1);
+  border-color: rgba(0, 123, 255, 0.3);
 }
 
 body.light-mode .code-block-btn {
