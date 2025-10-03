@@ -1,4 +1,6 @@
 /.codebuddy
+/.gitignore
 /config.json
 /FileServer.py
-/Image_1753107766359.jpg
+/01.png
+/02.png
