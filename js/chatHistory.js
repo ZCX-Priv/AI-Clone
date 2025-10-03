@@ -62,7 +62,7 @@ class ChatHistoryUI {
     `;
 
     // 绑定事件
-    header.querySelector('#backBtn').onclick = () => this.close();
+    header.querySelector('#backBtn').onclick = () => this.handleBackButton();
     header.querySelector('#searchBtn').onclick = () => this.showSearch();
     header.querySelector('#exportBtn').onclick = () => this.exportData();
     header.querySelector('#clearBtn').onclick = () => this.clearAllData();
@@ -81,6 +81,26 @@ class ChatHistoryUI {
     content.innerHTML = '<div class="loading">加载中...</div>';
 
     try {
+      // 检查 chatManager 是否可用
+      if (!this.chatManager) {
+        throw new Error('聊天管理器未初始化');
+      }
+
+      // 等待数据库初始化完成
+      if (!this.chatManager.db) {
+        content.innerHTML = '<div class="loading">正在初始化数据库...</div>';
+        // 等待最多5秒让数据库初始化
+        let retries = 50;
+        while (!this.chatManager.db && retries > 0) {
+          await new Promise(resolve => setTimeout(resolve, 100));
+          retries--;
+        }
+        
+        if (!this.chatManager.db) {
+          throw new Error('数据库初始化超时');
+        }
+      }
+
       const sessions = await this.chatManager.getAllSessions();
       
       if (sessions.length === 0) {
@@ -106,7 +126,13 @@ class ChatHistoryUI {
 
     } catch (error) {
       console.error('加载会话列表失败:', error);
-      content.innerHTML = '<div class="error">加载失败，请重试</div>';
+      content.innerHTML = `
+        <div class="error">
+          <i class="fa-solid fa-exclamation-triangle"></i>
+          <p>加载失败：${error.message}</p>
+          <button class="btn-primary" onclick="chatHistoryUI.showSessions()">重试</button>
+        </div>
+      `;
     }
   }
 
@@ -156,10 +182,21 @@ class ChatHistoryUI {
     content.innerHTML = '<div class="loading">加载中...</div>';
 
     try {
+      // 检查 chatManager 是否可用
+      if (!this.chatManager || !this.chatManager.db) {
+        throw new Error('聊天管理器未就绪');
+      }
+
       const messages = await this.chatManager.getMessagesBySessionId(sessionId);
       
       if (messages.length === 0) {
-        content.innerHTML = '<div class="empty-state"><p>该会话暂无消息</p></div>';
+        content.innerHTML = `
+          <div class="empty-state">
+            <i class="fa-solid fa-comment-slash"></i>
+            <p>该会话暂无消息</p>
+            <button class="btn-primary" onclick="chatHistoryUI.showSessions()">返回会话列表</button>
+          </div>
+        `;
         return;
       }
 
@@ -167,8 +204,22 @@ class ChatHistoryUI {
       messagesList.className = 'messages-list';
 
       messages.forEach(message => {
-        const messageItem = this.createMessageItem(message);
-        messagesList.appendChild(messageItem);
+        try {
+          const messageItem = this.createMessageItem(message);
+          messagesList.appendChild(messageItem);
+        } catch (itemError) {
+          console.error('创建消息项失败:', itemError, message);
+          // 创建一个简单的错误消息项
+          const errorItem = document.createElement('div');
+          errorItem.className = 'message-item error';
+          errorItem.innerHTML = `
+            <div class="message-content">
+              <div class="message-text">消息渲染失败</div>
+              <div class="message-time">${new Date(message.timestamp).toLocaleString('zh-CN')}</div>
+            </div>
+          `;
+          messagesList.appendChild(errorItem);
+        }
       });
 
       content.innerHTML = '';
@@ -176,7 +227,16 @@ class ChatHistoryUI {
 
     } catch (error) {
       console.error('加载消息失败:', error);
-      content.innerHTML = '<div class="error">加载失败，请重试</div>';
+      content.innerHTML = `
+        <div class="error">
+          <i class="fa-solid fa-exclamation-triangle"></i>
+          <p>加载失败：${error.message}</p>
+          <div class="error-actions">
+            <button class="btn-primary" onclick="chatHistoryUI.viewSession('${sessionId}')">重试</button>
+            <button class="btn-secondary" onclick="chatHistoryUI.showSessions()">返回列表</button>
+          </div>
+        </div>
+      `;
     }
   }
 
@@ -192,13 +252,52 @@ class ChatHistoryUI {
       ? '<i class="fa-solid fa-user"></i>' 
       : '<i class="fa-solid fa-robot"></i>';
 
-    item.innerHTML = `
-      <div class="message-avatar">${avatar}</div>
-      <div class="message-content">
-        <div class="message-text">${this.escapeHtml(message.message)}</div>
-        <div class="message-time">${time}</div>
-      </div>
-    `;
+    // 创建消息内容容器
+    const messageContent = document.createElement('div');
+    messageContent.className = 'message-content';
+    
+    // 创建消息文本容器
+    const messageText = document.createElement('div');
+    messageText.className = 'message-text';
+    
+    // 使用与主聊天页面相同的渲染器
+    if (window.messageRenderer) {
+      try {
+        // 渲染消息内容（支持Markdown、代码块等）
+        window.messageRenderer.render(message.message).then(renderedContent => {
+          messageText.innerHTML = renderedContent;
+          
+          // 如果使用MathJax，需要重新渲染数学公式
+          if (window.messageRenderer.getMathRenderer() === 'mathjax') {
+            setTimeout(() => {
+              window.messageRenderer.renderMathJax(messageText);
+            }, 50);
+          }
+        }).catch(error => {
+          console.error('消息渲染失败:', error);
+          messageText.innerHTML = this.escapeHtml(message.message);
+        });
+      } catch (error) {
+        console.error('渲染器调用失败:', error);
+        messageText.innerHTML = this.escapeHtml(message.message);
+      }
+    } else {
+      // 降级处理：如果渲染器不可用，使用简单的HTML转义
+      messageText.innerHTML = this.escapeHtml(message.message);
+    }
+    
+    // 创建时间显示
+    const messageTime = document.createElement('div');
+    messageTime.className = 'message-time';
+    messageTime.textContent = time;
+    
+    // 组装消息内容
+    messageContent.appendChild(messageText);
+    messageContent.appendChild(messageTime);
+    
+    // 组装完整消息项
+    item.innerHTML = `<div class="message-avatar">${avatar}</div>`;
+    item.appendChild(messageContent);
 
     return item;
   }
@@ -390,6 +489,22 @@ class ChatHistoryUI {
     } catch (error) {
       console.error('清空失败:', error);
       await showError('清空失败，请重试');
+    }
+  }
+
+  /**
+   * 处理返回按钮点击
+   */
+  handleBackButton() {
+    if (this.currentView === 'messages') {
+      // 如果在会话详情页面，返回到会话列表
+      this.showSessions();
+    } else if (this.currentView === 'search') {
+      // 如果在搜索页面，返回到会话列表
+      this.showSessions();
+    } else {
+      // 如果在会话列表页面，关闭整个历史记录界面
+      this.close();
     }
   }
 
