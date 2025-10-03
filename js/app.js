@@ -141,23 +141,33 @@ class ChatUIManager {
     }
 
     async initialize() {
+        // 更新loading状态
+        this.updateLoadingStatus('加载配置中...');
+        
         await this.config.loadPersonas();
         this.initTheme();
         this.updatePersonaVisuals();
+        
+        this.updateLoadingStatus('初始化界面...');
         await this.initializeUI();
         this.bindEvents();
         this.updateStatus();
         
         // 确保DOM完全加载后再绑定滚动事件
+        this.updateLoadingStatus('绑定事件...');
         setTimeout(() => {
             this.bindScrollEvents();
         }, 100);
         
         // 页面加载完成后检测初始滚动位置并确保滚动到底部
+        this.updateLoadingStatus('完成初始化...');
         setTimeout(() => {
             this.checkInitialScrollPosition();
             // 最终确保滚动到底部
             this.ensureScrollToBottom();
+            
+            // 等待所有资源加载完成后隐藏loading页面
+            this.waitForAllResourcesLoaded();
         }, 500);
     }
 
@@ -1183,10 +1193,188 @@ ${roleMessage}` : systemMessage;
         
         console.log('已清空主页面并开始新对话');
     }
+
+    // Loading页面控制方法
+    updateLoadingStatus(status) {
+        const loadingStatus = document.getElementById('loadingScreen')?.querySelector('.loading-status');
+        if (loadingStatus) {
+            loadingStatus.textContent = status;
+        }
+    }
+
+    waitForAllResourcesLoaded() {
+        this.updateLoadingStatus('加载资源中...');
+        
+        // 检查页面加载状态
+        if (document.readyState === 'complete') {
+            // 页面已完全加载，等待图片和其他资源
+            this.waitForImages();
+        } else {
+            // 等待页面完全加载
+            window.addEventListener('load', () => {
+                this.waitForImages();
+            });
+        }
+    }
+
+    waitForImages() {
+        this.updateLoadingStatus('加载图片资源...');
+        
+        const images = document.querySelectorAll('img');
+        const videos = document.querySelectorAll('video');
+        const allMedia = [...images, ...videos];
+        
+        if (allMedia.length === 0) {
+            // 没有媒体资源，直接完成
+            this.finishLoading();
+            return;
+        }
+        
+        let loadedCount = 0;
+        const totalCount = allMedia.length;
+        let hasFinished = false;
+        
+        const checkAllLoaded = () => {
+            if (hasFinished) return;
+            
+            loadedCount++;
+            this.updateLoadingStatus(`加载资源中... (${loadedCount}/${totalCount})`);
+            
+            if (loadedCount >= totalCount) {
+                hasFinished = true;
+                this.finishLoading();
+            }
+        };
+        
+        // 为每个媒体资源设置单独的超时
+        allMedia.forEach((media, index) => {
+            let mediaLoaded = false;
+            
+            const handleMediaLoad = () => {
+                if (mediaLoaded) return;
+                mediaLoaded = true;
+                checkAllLoaded();
+            };
+            
+            if (media.tagName === 'IMG') {
+                if (media.complete && media.naturalHeight !== 0) {
+                    // 图片已加载
+                    handleMediaLoad();
+                } else {
+                    // 等待图片加载
+                    media.addEventListener('load', handleMediaLoad);
+                    media.addEventListener('error', handleMediaLoad);
+                    
+                    // 为每个图片设置3秒超时
+                    setTimeout(() => {
+                        if (!mediaLoaded) {
+                            console.warn(`图片加载超时: ${media.src}`);
+                            handleMediaLoad();
+                        }
+                    }, 3000);
+                }
+            } else if (media.tagName === 'VIDEO') {
+                if (media.readyState >= 2) { // 降低要求，有元数据就算加载完成
+                    // 视频已加载基本数据
+                    handleMediaLoad();
+                } else {
+                    // 等待视频加载
+                    media.addEventListener('loadedmetadata', handleMediaLoad);
+                    media.addEventListener('canplay', handleMediaLoad);
+                    media.addEventListener('error', handleMediaLoad);
+                    
+                    // 为每个视频设置5秒超时
+                    setTimeout(() => {
+                        if (!mediaLoaded) {
+                            console.warn(`视频加载超时: ${media.src}`);
+                            handleMediaLoad();
+                        }
+                    }, 5000);
+                }
+            }
+        });
+        
+        // 设置全局超时，防止整体加载过久
+        setTimeout(() => {
+            if (!hasFinished) {
+                console.warn(`资源加载全局超时，已加载 ${loadedCount}/${totalCount} 个资源`);
+                hasFinished = true;
+                this.finishLoading();
+            }
+        }, 8000); // 8秒全局超时
+        
+        // 如果大部分资源已加载，提前完成
+        const checkProgress = () => {
+            if (hasFinished) return;
+            
+            const progressPercent = loadedCount / totalCount;
+            if (progressPercent >= 0.8 && loadedCount >= totalCount - 2) {
+                // 如果80%以上资源已加载且只剩1-2个资源，等待2秒后强制完成
+                setTimeout(() => {
+                    if (!hasFinished && loadedCount >= totalCount - 2) {
+                        console.log(`大部分资源已加载完成 (${loadedCount}/${totalCount})，提前完成`);
+                        hasFinished = true;
+                        this.finishLoading();
+                    }
+                }, 2000);
+            }
+        };
+        
+        // 每秒检查一次进度
+        const progressInterval = setInterval(() => {
+            if (hasFinished) {
+                clearInterval(progressInterval);
+                return;
+            }
+            checkProgress();
+        }, 1000);
+    }
+
+    finishLoading() {
+        this.updateLoadingStatus('加载完成');
+        
+        // 等待一小段时间让用户看到完成状态
+        setTimeout(() => {
+            this.hideLoadingScreen();
+        }, 500);
+    }
+
+    hideLoadingScreen() {
+        const loadingScreen = document.getElementById('loadingScreen');
+        const mainApp = document.getElementById('mainApp');
+        
+        if (loadingScreen && mainApp) {
+            // 添加淡出效果
+            loadingScreen.classList.add('fade-out');
+            
+            // 显示主应用
+            mainApp.style.display = 'flex';
+            
+            // 等待动画完成后移除loading页面
+            setTimeout(() => {
+                if (loadingScreen.parentNode) {
+                    loadingScreen.parentNode.removeChild(loadingScreen);
+                }
+            }, 500);
+            
+            console.log('Loading页面已隐藏，主应用已显示');
+        }
+    }
 }
 
 // 初始化应用
 document.addEventListener('DOMContentLoaded', () => {
+    // 在创建ChatUIManager之前先初始化主题，避免loading页面闪烁
+    initializeThemeEarly();
     window.chatUIManager = new ChatUIManager();
 });
+
+// 提前初始化主题，避免loading页面主题闪烁
+function initializeThemeEarly() {
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    const isLight = savedTheme === 'light';
+    document.body.classList.toggle('light-mode', isLight);
+    document.body.classList.toggle('dark-mode', !isLight);
+    console.log('提前应用主题:', savedTheme);
+}
 

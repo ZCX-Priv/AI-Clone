@@ -49,8 +49,45 @@
   <script src="./js/chatManager.js"></script>
   <script src="./js/chatHistory.js"></script>
   <script src="./js/app.js"></script>
+  
+  <!-- 提前应用主题，避免loading页面闪烁 -->
+  <script>
+    (function() {
+      const savedTheme = localStorage.getItem('theme') || 'dark';
+      const isLight = savedTheme === 'light';
+      document.documentElement.classList.toggle('light-mode', isLight);
+      document.documentElement.classList.toggle('dark-mode', !isLight);
+    })();
+  </script>
 </head>
 <body>
+  <!-- 提前应用主题，避免loading页面闪烁 -->
+  <script>
+    (function() {
+      const savedTheme = localStorage.getItem('theme') || 'dark';
+      const isLight = savedTheme === 'light';
+      document.body.classList.toggle('light-mode', isLight);
+      document.body.classList.toggle('dark-mode', !isLight);
+    })();
+  </script>
+  <!-- Loading 页面 -->
+  <div id="loadingScreen" class="loading-screen">
+    <div class="loading-container">
+      <div class="loading-logo">
+        <i class="fa-solid fa-robot"></i>
+      </div>
+      <div class="loading-text">AI数字人</div>
+      <div class="loading-spinner">
+        <div class="spinner-ring"></div>
+        <div class="spinner-ring"></div>
+        <div class="spinner-ring"></div>
+      </div>
+      <div class="loading-status">正在初始化...</div>
+    </div>
+  </div>
+
+  <!-- 主应用内容 -->
+  <div id="mainApp" class="main-app" style="display: none;">
   <!-- 左侧人物头像（悬浮在背景上） -->
   <div class="left-panel">
     <!-- 角色名称（固定在顶部） -->
@@ -111,5 +148,6 @@
       <button aria-label="发送"><i class="fa-solid fa-paper-plane"></i></button>
     </div>
   </div>
+  </div> <!-- 主应用内容结束 -->
 </body>
 </html>
