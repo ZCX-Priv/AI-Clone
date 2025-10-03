@@ -62,7 +62,9 @@ class Config {
                     // 保持向后兼容的旧字段
                     leftImage: role.leftImage || role.leftMedia || './imgs/img.jpg',
                     // 直接使用整个角色 md 内容作为提示词，若无则回退到 role.js 的定义
-                    rolePrompt: content || role.rolePrompt || ''
+                    rolePrompt: content || role.rolePrompt || '',
+                    // 添加角色自定义开场白支持
+                    greeting: role.greeting || '你好！我是你的AI陪伴，有什么想聊的吗？ 😊'
                 };
             } catch (error) {
                 console.error(`加载人格 ${key || md} 失败:`, error);
@@ -242,8 +244,12 @@ class ChatUIManager {
     }
 
     async showWelcomeMessage() {
+        // 获取当前角色的自定义开场白
+        const persona = this.config.personas[this.config.currentPersona];
+        const greeting = persona?.greeting || (window.getRoleGreeting ? window.getRoleGreeting(this.config.currentPersona) : '你好！我是你的AI陪伴，有什么想聊的吗？ 😊');
+        
         // 添加欢迎消息（首条使用机器人头像）
-        await this.addMessage('assistant', '你好！我是你的AI陪伴，有什么想聊的吗？ 😊', { robotFirst: true });
+        await this.addMessage('assistant', greeting, { robotFirst: true });
         
         // 显示欢迎消息后确保滚动到底部
         setTimeout(() => {
@@ -994,6 +1000,8 @@ ${roleMessage}` : systemMessage;
 
         // 保存
         settingsView.querySelector('#saveBtn').onclick = async () => {
+            const oldPersona = this.config.currentPersona;
+            
             this.config.apiKey = settingsView.querySelector('#apiKeyInput').value.trim();
             this.config.endpoint = endpointSelect.value;
             this.config.currentPersona = personaSelect.value;
@@ -1004,6 +1012,21 @@ ${roleMessage}` : systemMessage;
             this.config.save();
             this.updatePersonaVisuals();
             this.updateStatus();
+            
+            // 如果角色发生变化，询问是否开始新对话以体验新角色
+            if (oldPersona !== this.config.currentPersona && this.messages.length > 0) {
+                const confirmed = await showConfirm(
+                    `角色已切换为"${this.config.personas[this.config.currentPersona]?.name || '未知角色'}"。是否开始新对话以体验新角色的开场白？`,
+                    '角色已切换',
+                    { confirmText: '开始新对话', cancelText: '继续当前对话' }
+                );
+                if (confirmed) {
+                    // 延迟执行，确保设置窗口先关闭
+                    setTimeout(() => {
+                        this.startNewChat();
+                    }, 100);
+                }
+            }
             
             // 如果数学渲染器发生变化，重新加载页面以应用新的渲染器
             const oldMathRenderer = localStorage.getItem('math_renderer');
