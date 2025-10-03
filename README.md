@@ -1,122 +1,264 @@
-# AI陪伴聊天应用
+# AI数字人陪伴聊天应用
 
-一个简洁的前端本地运行聊天应用，支持多提供方与多模型，内置角色人格，流式输出。
+一个功能丰富的前端AI聊天应用，支持多AI提供商、角色人格系统、富文本渲染和聊天记录管理。
 
-## 近期变更
+## ✨ 主要特性
 
-- 提供方顺序不再写死在脚本中，现由 `config.js` 的 `API_CONFIG` 动态生成，且“已启用(enabled=true)的提供方优先”。
-- 新增或启用/停用提供方只需改 `config.js`，UI 会自动更新顺序与可选项。
-- 默认示例中 `pollinations` 为启用状态，且无需 API Key，可开箱即用。
+### 🤖 多AI提供商支持
+### 👥 角色人格系统
+### 💬 聊天功能
+- **流式对话**: 实时显示AI回复过程
+- **富文本渲染**: 支持Markdown、代码高亮、数学公式
+- **聊天记录**: IndexedDB本地存储，支持搜索和导出
+- **会话管理**: 多会话切换，历史记录查看
+- **响应式设计**: 完美适配桌面和移动设备
 
-## 功能特点
+### 🎨 界面特性
+- **双主题**: 明亮/暗黑主题一键切换
+- **加载动画**: 优雅的启动页面和资源加载
+- **媒体支持**: 角色图片/视频展示，可调节大小
+- **工具栏**: 新对话、历史记录、设置等快捷操作
+- **滚动控制**: 智能滚动到底部按钮
 
-- 多提供方与模型：OpenAI、Google、Anthropic、xAI、DeepSeek、OpenRouter、Pollinations 等
-- 人格系统：从 `personas/*.md` 动态解析标题与“## 系统提示词”
-- 流式对话：SSE data: 行级增量渲染
-- 本地存储：保存当前提供方、API Key、模型与人格选择
-- 主题切换：明/暗色一键切换
-
-## 目录结构
+## 📁 项目结构
 
 ```
 AI陪伴/
-├── index.html          # 页面入口（确保 config.js、role.js 在 script.js 之前引入）
-├── style.css           # 样式
-├── script.js           # 主逻辑（加载人格、聊天、设置、主题等）
-├── role.js             # 角色清单（window.ROLES）
-├── config.js           # 提供方与模型配置（动态驱动 UI 与调用）
-├── config.json         # 简易静态服务配置（用于可选服务器）
-├── FileServer.py       # 可选：简易静态文件服务器
-├── personas/           # 人格 Markdown
-│   ├── system.md
-│   ├── companion.md
-│   ├── friend.md
-│   └── mentor.md
-└── avatars/
-    └── avatar.jpg
+├── index.html              # 主页面入口
+├── favicon.png             # 网站图标
+├── README.md              # 项目说明文档
+│
+├── css/                   # 样式文件
+│   ├── style.css          # 主样式
+│   ├── chatHistory.css    # 聊天记录样式
+│   └── mobile-optimized.css # 移动端优化
+│
+├── js/                    # JavaScript模块
+│   ├── app.js             # 主应用逻辑
+│   ├── config.js          # AI提供商配置
+│   ├── role.js            # 角色定义
+│   ├── chatManager.js     # 聊天记录管理
+│   ├── chatHistory.js     # 历史记录界面
+│   ├── renderer.js        # 富文本渲染器
+│   └── modal.js           # 弹窗组件
+│
+├── personas/              # 角色人格定义
+│   ├── system.md          # 系统提示词
+│   ├── lyt.md             
+│   ├── zxw.md             
+│   └── hjl.md             
+│
+├── avatars/               # 角色头像
+│   ├── avatar01.jpg       
+│   ├── avatar02.jpg       
+│   └── avatar03.jpg       
+│
+└── imgs/                  # 角色展示图片
+    ├── img01.jpg          
+    ├── img02.jpg          
+    └── img03.jpg          
 ```
 
-## 启动方式
+## 🚀 快速开始
 
-请选择任一方式启动本地 HTTP 服务器（不要用 `file://` 直接打开 index.html，否则会因 CORS 无法加载 personas/*.md）。
+### 环境要求
+- 现代浏览器（Chrome 88+, Firefox 85+, Safari 14+）
+- 本地HTTP服务器（不支持file://协议）
 
-- 方式一：Python 内置服务器（最简单）
-  ```
-  python -m http.server 5500
-  # 浏览器访问 http://localhost:5500/index.html
-  ```
+### 启动方法
 
-- 方式二：VS Code Live Server / Node http-server / PHP 内置服务器
-  ```
-  # Node
-  npx http-server . -p 8000
-  # PHP
-  php -S localhost:8000
-  # 然后访问 http://localhost:8000/index.html
-  ```
+#### 方法一：Python内置服务器（推荐）
+```bash
+# 在项目根目录执行
+python -m http.server 5500
 
-- 方式三：可选使用仓库中的简易服务器
-  ```
-  python FileServer.py
-  # 若该脚本依赖 config.json，请按需调整端口与路径
-  ```
+# 浏览器访问
+http://localhost:5500
+```
 
-## 配置提供方与模型
+#### 方法二：Node.js服务器
+```bash
+# 使用http-server
+npx http-server . -p 8000
 
-- 在 `config.js` 中维护 `API_CONFIG`。每个键为提供方 key，包含：
-  - name：展示名
-  - enabled：是否启用（启用项将排在下拉列表前面）
-  - baseURL / headers：OpenAI Chat Completions 兼容端点与请求头模板（{API_KEY}/{REFERER} 会在运行时替换）
-  - defaultModel：在设置界面默认选中的模型 ID
-  - models：{ 模型ID: 模型别名 }（界面展示别名，提交使用模型ID）
+# 浏览器访问
+http://localhost:8000
+```
 
-- 动态顺序与默认选择
-  - 顺序来源：`script.js` 中 `PROVIDER_ORDER = Object.keys(API_CONFIG).sort(...)`，启用项优先
-  - 默认活跃提供方：用户未选择时，取顺序中首个 `enabled=true` 的提供方；若均未启用，则回退 `'openrouter'`
-  - 新增提供方：向 `API_CONFIG` 添加一个键，即可自动出现在设置界面；设为 `enabled: true` 可置前
+#### 方法三：VS Code Live Server
+1. 安装Live Server扩展
+2. 右键index.html选择"Open with Live Server"
 
-- API Key 说明
-  - `pollinations` 示例中为启用状态且无需用户填写 Key（headers 模板会用内置值）
-  - 其他提供方需在“设置”中填入对应 Key（UI 默认提示 OpenRouter，可忽略文案，按所选提供方填写即可）
+#### 方法四：PHP内置服务器
+```bash
+php -S localhost:8000
 
-## 使用指南
+# 浏览器访问
+http://localhost:8000
+```
 
-1. 启动本地服务器并打开页面
-2. 点击右上角“设置”
-   - 选择“提供方”（顺序已按启用优先）
-   - 输入该提供方的 API Key（如需要）
-   - 选择模型与人格
-   - 保存后状态栏会更新“端点: 提供方名称 · 模型别名”
-3. 聊天区域输入消息并发送，回复将以流式形式出现
-4. 可随时切换主题、修改设置；设置保存在浏览器本地
+## ⚙️ 配置说明
 
-## 角色与人格
+### AI提供商配置
+在 `js/config.js` 中配置AI提供商：
 
-- 定义在 `role.js` 的全局 `window.ROLES` 数组中：
-  ```js
-  [
-    { key: 'system', name: '系统提示词', md: 'system.md' },
-    { key: 'companion', name: '陪伴者', md: 'companion.md' },
-    { key: 'friend', name: '朋友', md: 'friend.md' },
-    { key: 'mentor', name: '导师', md: 'mentor.md' }
-  ]
-  ```
-- 应用会据此从 `personas/` 目录逐个 `fetch` 对应 md，解析：
-  - 标题行 `# xxx` 作为名称（若 `role.js` 已提供 name，则优先使用其 name）
-  - “## 系统提示词”后的内容作为 system message
+```javascript
+const API_CONFIG = {
+  pollinations: {
+    name: 'Pollinations',
+    enabled: true,  // 设为true启用
+    baseURL: 'https://text.pollinations.ai/openai/v1/chat/completions',
+    apiKey: 'xxx',  // 内置密钥
+    defaultModel: 'deepseek',
+    models: {
+      'deepseek': 'DeepSeek',
+      'openai': 'OpenAI',
+      // ...更多模型
+    }
+  }
+  // ...其他提供商
+};
+```
 
-- 回退策略：若 `window.ROLES` 不可用，将尝试加载 `companion/friend/mentor` 三个固定文件
+### 角色配置
+在 `js/role.js` 中定义角色：
 
-## 故障排查
+```javascript
+const ROLES = [
+  { 
+    key: 'teacher', 
+    name: '老师', 
+    md: 'teacher.md', 
+    leftMedia: './imgs/img01.jpg',
+    mediaType: 'image',
+    avatar: './avatars/avatar01.jpg',
+    greeting: '你好！我是老师，有什么想聊的吗？'
+  }
+  // ...更多角色
+];
+```
 
-- 页面空白或角色不加载：确认是通过 HTTP 服务访问，而不是直接双击打开；在控制台检查 `personas/*.md` 的网络状态
-- 无法生成：检查设置中提供方/模型是否有效、API Key 是否正确、网络是否可用
-- 流式响应解析错误：若使用非兼容端点，请确保其遵循 OpenAI Chat Completions SSE `data:` 事件格式
+## 📖 使用指南
 
-## 许可证
+### 首次使用
+1. 启动本地服务器并访问应用
+2. 等待资源加载完成
+3. 点击右上角设置按钮⚙️
+4. 选择AI提供商和模型
+5. 输入API密钥（如需要）
+6. 选择喜欢的角色人格
+7. 保存设置开始聊天
 
-MIT License
+### 基本操作
+- **发送消息**: 在输入框输入内容，点击发送按钮
+- **新对话**: 点击➕按钮开始新的对话会话
+- **查看历史**: 点击🕒按钮查看聊天历史记录
+- **切换主题**: 点击🌙/☀️按钮切换明暗主题
+- **调节角色大小**: 使用左侧滑块调节角色图片/视频大小
 
-## 贡献
+### 高级功能
+- **数学公式**: 支持LaTeX语法，如 `$E=mc^2$` 或 `$$\int_0^1 x dx$$`
+- **代码高亮**: 自动识别代码语言并高亮显示
+- **表格渲染**: 支持Markdown表格语法
+- **搜索历史**: 在历史记录中搜索特定内容
+- **导出对话**: 将聊天记录导出为JSON格式
 
-欢迎提交 Issue / PR 改进文档、适配更多提供方或优化前端体验。
+## 🛠️ 技术特性
+
+### 前端技术栈
+- **原生JavaScript**: 无框架依赖，轻量高效
+- **CSS3**: 现代样式，支持动画和响应式
+- **IndexedDB**: 本地数据存储
+- **Web APIs**: Fetch、Stream、LocalStorage等
+
+### 渲染引擎
+- **Marked.js**: Markdown解析
+- **Prism.js**: 代码语法高亮
+- **KaTeX/MathJax**: 数学公式渲染
+- **DOMPurify**: XSS防护
+
+### 兼容性
+- **OpenAI API**: 完全兼容Chat Completions格式
+- **流式响应**: 支持Server-Sent Events
+- **跨平台**: 支持Windows、macOS、Linux
+- **移动端**: 响应式设计，触屏友好
+
+## 🔧 自定义开发
+
+### 添加新的AI提供商
+1. 在 `js/config.js` 中添加配置
+2. 确保API兼容OpenAI Chat Completions格式
+3. 设置 `enabled: true` 启用
+
+### 创建新角色
+1. 在 `personas/` 目录创建Markdown文件
+2. 在 `js/role.js` 中添加角色定义
+3. 准备角色头像和展示图片
+4. 重启应用即可使用
+
+### 自定义样式
+- 修改 `css/style.css` 调整主题色彩
+- 编辑 `css/mobile-optimized.css` 优化移动端体验
+- 在 `css/chatHistory.css` 中自定义历史记录样式
+
+## 🐛 故障排查
+
+### 常见问题
+
+**页面空白或加载失败**
+- 确保使用HTTP服务器访问，不要直接打开HTML文件
+- 检查浏览器控制台是否有错误信息
+- 确认所有资源文件完整
+
+**AI无法回复**
+- 检查API密钥是否正确配置
+- 确认选择的AI提供商服务正常
+- 查看网络连接是否稳定
+
+**角色图片不显示**
+- 确认图片文件路径正确
+- 检查图片文件是否存在
+- 验证图片格式是否支持
+
+**聊天记录丢失**
+- IndexedDB数据存储在浏览器本地
+- 清除浏览器数据会删除聊天记录
+- 建议定期导出重要对话
+
+### 调试模式
+打开浏览器开发者工具（F12）查看详细错误信息：
+- Console标签页：查看JavaScript错误
+- Network标签页：检查API请求状态
+- Application标签页：查看本地存储数据
+
+## 📄 许可证
+
+MIT License - 详见LICENSE文件
+
+## 🤝 贡献指南
+
+欢迎提交Issue和Pull Request！
+
+### 贡献方式
+1. Fork本项目
+2. 创建特性分支 (`git checkout -b feature/AmazingFeature`)
+3. 提交更改 (`git commit -m 'Add some AmazingFeature'`)
+4. 推送到分支 (`git push origin feature/AmazingFeature`)
+5. 创建Pull Request
+
+### 开发建议
+- 保持代码风格一致
+- 添加必要的注释
+- 测试新功能的兼容性
+- 更新相关文档
+
+## 📞 支持与反馈
+
+如果您在使用过程中遇到问题或有改进建议，请：
+- 提交GitHub Issue
+- 发送邮件反馈
+- 参与项目讨论
+
+---
+
+**享受与AI数字人的智能对话体验！** 🎉
