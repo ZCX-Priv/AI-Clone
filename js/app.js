@@ -10,7 +10,7 @@ const PROVIDER_ORDER = Object.keys(API_CONFIG || {}).sort((a, b) => {
 function getActiveProvider(providerKey) {
     const keyFromStorage = providerKey || localStorage.getItem('api_provider');
     const selected = keyFromStorage && API_CONFIG[keyFromStorage] ? keyFromStorage
-        : (PROVIDER_ORDER.find(k => API_CONFIG[k]?.enabled) || 'openrouter');
+        : (PROVIDER_ORDER.find(k => API_CONFIG[k]?.enabled) || PROVIDER_ORDER[0]);
     return { key: selected, conf: API_CONFIG[selected] };
 }
 
@@ -20,8 +20,8 @@ class Config {
         const { key, conf } = getActiveProvider();
         this.providerKey = localStorage.getItem('api_provider') || key;
         const { conf: conf2 } = getActiveProvider(this.providerKey);
-        this.apiKey = localStorage.getItem('openrouter_api_key') || conf2.apiKey || '';
-        this.endpoint = localStorage.getItem('openrouter_endpoint') || conf2.defaultModel;
+        this.apiKey = localStorage.getItem(`${this.providerKey}_api_key`) || conf2.apiKey || '';
+        this.endpoint = localStorage.getItem(`${this.providerKey}_endpoint`) || conf2.defaultModel;
         this.currentPersona = localStorage.getItem('current_persona') || 'companion';
         
         // 新增配置选项
@@ -118,8 +118,8 @@ class Config {
 
     save() {
         localStorage.setItem('api_provider', this.providerKey);
-        localStorage.setItem('openrouter_api_key', this.apiKey);
-        localStorage.setItem('openrouter_endpoint', this.endpoint);
+        localStorage.setItem(`${this.providerKey}_api_key`, this.apiKey);
+        localStorage.setItem(`${this.providerKey}_endpoint`, this.endpoint);
         localStorage.setItem('current_persona', this.currentPersona);
         
         // 保存新增配置
