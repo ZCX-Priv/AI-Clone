@@ -331,7 +331,33 @@ class ChatUIManager {
             });
         }
 
+        // 媒体大小滑块
+        const mediaSizeSlider = document.getElementById('mediaSizeSlider');
+        const sizeValue = document.getElementById('sizeValue');
+        if (mediaSizeSlider && sizeValue) {
+            // 从本地存储加载媒体大小设置
+            const savedSize = localStorage.getItem('media_size') || '75';
+            mediaSizeSlider.value = savedSize;
+            sizeValue.textContent = savedSize + '%';
+            this.updateMediaSize(parseInt(savedSize));
+
+            mediaSizeSlider.addEventListener('input', (e) => {
+                const value = e.target.value;
+                sizeValue.textContent = value + '%';
+                this.updateMediaSize(parseInt(value));
+                localStorage.setItem('media_size', value);
+            });
+        }
+
         // 返回底部按钮和滚动事件将在bindScrollEvents中绑定
+    }
+
+    // 更新媒体大小
+    updateMediaSize(size) {
+        const mediaContainer = document.getElementById('leftMediaContainer');
+        if (mediaContainer) {
+            mediaContainer.style.width = size + '%';
+        }
     }
 
     updateStatus() {
@@ -653,7 +679,16 @@ ${roleMessage}` : systemMessage;
     updatePersonaVisuals() {
         const persona = this.config.personas[this.config.currentPersona] || {};
         this.updateLeftMedia(persona);
+        this.updateCharacterName(persona);
         this.assistantAvatar = persona.avatar || './avatars/avatar.jpg';
+    }
+
+    // 更新角色名称显示
+    updateCharacterName(persona) {
+        const characterNameElement = document.getElementById('characterName');
+        if (characterNameElement) {
+            characterNameElement.textContent = persona.name || '未知角色';
+        }
     }
 
     // 更新左侧媒体显示（图片或视频）
@@ -864,12 +899,38 @@ ${roleMessage}` : systemMessage;
         // 强制刷新按钮
         forceRefreshBtn.onclick = async () => {
             const confirmed = await showConfirm(
-                '确定要强制刷新页面吗？未保存的设置将丢失。',
+                '确定要强制刷新页面吗？这将清除所有缓存并重新加载页面，未保存的设置将丢失。',
                 '强制刷新',
                 { confirmText: '刷新', cancelText: '取消' }
             );
             if (confirmed) {
-                location.reload();
+                // 实现硬刷新，相当于 Ctrl+F5
+                if ('serviceWorker' in navigator) {
+                    // 清除 Service Worker 缓存
+                    navigator.serviceWorker.getRegistrations().then(registrations => {
+                        registrations.forEach(registration => registration.unregister());
+                    });
+                }
+                
+                // 清除各种缓存
+                if ('caches' in window) {
+                    caches.keys().then(names => {
+                        names.forEach(name => caches.delete(name));
+                    });
+                }
+                
+                // 清除本地存储（可选，根据需要）
+                // localStorage.clear();
+                // sessionStorage.clear();
+                
+                // 使用 location.reload(true) 强制从服务器重新加载
+                // 如果不支持，则添加随机参数强制刷新
+                try {
+                    location.reload(true);
+                } catch (e) {
+                    // 现代浏览器可能不支持 reload(true)，使用替代方案
+                    window.location.href = window.location.href + '?_t=' + Date.now();
+                }
             }
         };
 

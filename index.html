@@ -53,12 +53,25 @@
 <body>
   <!-- 左侧人物头像（悬浮在背景上） -->
   <div class="left-panel">
-    <div id="leftMediaContainer" class="media-container">
-      <img id="leftImage" src="./imgs/img.jpg" alt="人物" style="display: block;">
-      <video id="leftVideo" autoplay muted loop playsinline style="display: none;">
-        <source src="" type="video/mp4">
-        您的浏览器不支持视频播放。
-      </video>
+    <!-- 角色名称（固定在顶部） -->
+    <div class="character-name-fixed" id="characterName">角色名称</div>
+    
+    <!-- 媒体容器（居中） -->
+    <div class="media-wrapper">
+      <div id="leftMediaContainer" class="media-container">
+        <img id="leftImage" src="./imgs/img.jpg" alt="人物" style="display: block;">
+        <video id="leftVideo" autoplay muted loop playsinline style="display: none;">
+          <source src="" type="video/mp4">
+          您的浏览器不支持视频播放。
+        </video>
+      </div>
+    </div>
+    
+    <!-- 媒体大小调节滑块（固定在底部） -->
+    <div class="size-control-fixed">
+      <label for="mediaSizeSlider">大小</label>
+      <input type="range" id="mediaSizeSlider" min="50" max="100" value="75" step="5">
+      <span id="sizeValue">75%</span>
     </div>
   </div>
 
