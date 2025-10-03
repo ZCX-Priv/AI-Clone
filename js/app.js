@@ -22,7 +22,7 @@ class Config {
         const { conf: conf2 } = getActiveProvider(this.providerKey);
         this.apiKey = localStorage.getItem(`${this.providerKey}_api_key`) || conf2.apiKey || '';
         this.endpoint = localStorage.getItem(`${this.providerKey}_endpoint`) || conf2.defaultModel;
-        this.currentPersona = localStorage.getItem('current_persona') || 'companion';
+        this.currentPersona = localStorage.getItem('current_persona') || (window.getDefaultRole ? window.getDefaultRole() : 'companion');
         
         // 新增配置选项
         this.contextLength = parseInt(localStorage.getItem('context_length')) || 10;
@@ -54,7 +54,7 @@ class Config {
                 const parsed = this.parsePersona(content);
                 this.personas[key] = {
                     ...parsed,
-                    name: name || parsed.name || '未知角色',
+                    name: name || '未知角色',  // 直接使用 role.js 中定义的名称
                     avatar: role.avatar || './avatars/avatar.jpg',
                     // 支持新的媒体字段，同时保持向后兼容
                     leftMedia: role.leftMedia || role.leftImage || './imgs/img.jpg',
@@ -68,6 +68,16 @@ class Config {
                 };
             } catch (error) {
                 console.error(`加载人格 ${key || md} 失败:`, error);
+                // 即使 .md 文件加载失败，也要创建角色条目，使用 role.js 中的配置
+                this.personas[key] = {
+                    name: name || '未知角色',  // 直接使用 role.js 中定义的名称
+                    avatar: role.avatar || './avatars/avatar.jpg',
+                    leftMedia: role.leftMedia || role.leftImage || './imgs/img.jpg',
+                    mediaType: role.mediaType || 'image',
+                    leftImage: role.leftImage || role.leftMedia || './imgs/img.jpg',
+                    rolePrompt: role.rolePrompt || '',
+                    greeting: role.greeting || '你好！我是你的AI陪伴，有什么想聊的吗？ 😊'
+                };
             }
         }
 

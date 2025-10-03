@@ -2,27 +2,27 @@
   // 角色名称与其对应的提示词 Markdown 文件名
   const ROLES = [
     { 
-      key: 'companion', 
-      name: '陪伴者', 
-      md: 'companion.md', 
+      key: 'lyt', 
+      name: '李雅婷', 
+      md: 'lyt.md', 
       leftMedia: './imgs/img01.jpg',  // 支持图片和视频
       mediaType: 'image',             // 'image' 或 'video'
       avatar: './avatars/avatar01.jpg',
       greeting: '你好！我是你的温柔陪伴者，无论你遇到什么困扰或想要分享什么心情，我都会耐心倾听。有什么想聊的吗？ 😊'
     },
     { 
-      key: 'friend', 
-      name: '朋友', 
-      md: 'friend.md', 
+      key: 'zxw', 
+      name: '张兴旺', 
+      md: 'zxw.md', 
       leftMedia: './imgs/img02.jpg', 
       mediaType: 'image', 
       avatar: './avatars/avatar02.jpg',
       greeting: '嗨！很高兴见到你！我是你的AI朋友，我们可以聊任何有趣的话题。今天过得怎么样？ 🌟'
     },
     { 
-      key: 'mentor', 
-      name: '导师', 
-      md: 'mentor.md', 
+      key: 'hjl', 
+      name: '何家亮', 
+      md: 'hjl.md', 
       leftMedia: './imgs/img03.jpg', 
       mediaType: 'image', 
       avatar: './avatars/avatar03.jpg',
@@ -70,6 +70,11 @@
     }
   });
 
+  // 获取默认角色（使用第一个角色）
+  function getDefaultRole() {
+    return ROLES.length > 0 ? ROLES[0].key : 'companion';
+  }
+
   // 获取角色的开场白
   function getRoleGreeting(roleKey) {
     const role = ROLES.find(r => r.key === roleKey);
@@ -78,6 +83,7 @@
 
   // 暴露到全局（浏览器环境）
   global.ROLES = ROLES;
+  global.getDefaultRole = getDefaultRole;
   global.detectMediaType = detectMediaType;
   global.getRoleGreeting = getRoleGreeting;
 })(window);
