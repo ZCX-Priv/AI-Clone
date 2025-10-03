@@ -183,7 +183,7 @@ body.light-mode .loading-status {
   white-space: nowrap;
   padding: 12px calc(24px - 0.2em) 12px calc(24px + 0.2em);
   background: linear-gradient(135deg, rgba(74, 144, 226, 0.2) 0%, rgba(74, 144, 226, 0.1) 100%);
-  border-radius: 25px;
+  border-radius: 15px;
   border: 1px solid rgba(74, 144, 226, 0.3);
   backdrop-filter: blur(15px);
   box-shadow: 

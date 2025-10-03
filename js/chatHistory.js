@@ -314,7 +314,9 @@ class ChatHistoryUI {
       <div class="search-container">
         <div class="search-input-group">
           <input type="text" id="searchInput" placeholder="输入关键词搜索..." />
-          <button id="searchSubmitBtn" class="btn-primary">搜索</button>
+          <button id="searchSubmitBtn" class="btn-primary" title="搜索">
+            <i class="fa-solid fa-search"></i>
+          </button>
         </div>
         <div id="searchResults" class="search-results"></div>
       </div>
@@ -369,31 +371,130 @@ class ChatHistoryUI {
     item.className = `search-result-item ${message.type}`;
     
     const time = new Date(message.timestamp).toLocaleString('zh-CN');
-    const highlightedText = this.highlightKeyword(message.message, keyword);
 
-    item.innerHTML = `
-      <div class="result-header">
-        <span class="result-type">${message.type === 'user' ? '用户' : 'AI'}</span>
-        <span class="result-time">${time}</span>
-        ${message.persona ? `<span class="result-persona">${this.escapeHtml(message.persona)}</span>` : ''}
-      </div>
-      <div class="result-content">${highlightedText}</div>
-      <button class="btn-link" onclick="chatHistoryUI.viewSession('${message.sessionId}')">
-        查看完整对话
-      </button>
+    // 创建头部信息
+    const resultHeader = document.createElement('div');
+    resultHeader.className = 'result-header';
+    resultHeader.innerHTML = `
+      <span class="result-type">${message.type === 'user' ? '用户' : 'AI'}</span>
+      <span class="result-time">${time}</span>
+      ${message.persona ? `<span class="result-persona">${this.escapeHtml(message.persona)}</span>` : ''}
     `;
+
+    // 创建内容容器
+    const resultContent = document.createElement('div');
+    resultContent.className = 'result-content';
+
+    // 使用渲染器处理消息内容
+    if (window.messageRenderer) {
+      try {
+        window.messageRenderer.render(message.message).then(renderedContent => {
+          // 在渲染后的内容中高亮关键词
+          const highlightedContent = this.highlightKeywordInHTML(renderedContent, keyword);
+          resultContent.innerHTML = highlightedContent;
+          
+          // 如果使用MathJax，需要重新渲染数学公式
+          if (window.messageRenderer.getMathRenderer() === 'mathjax') {
+            setTimeout(() => {
+              window.messageRenderer.renderMathJax(resultContent);
+            }, 50);
+          }
+        }).catch(error => {
+          console.error('搜索结果渲染失败:', error);
+          const highlightedText = this.highlightKeyword(message.message, keyword);
+          resultContent.innerHTML = highlightedText;
+        });
+      } catch (error) {
+        console.error('搜索结果渲染器调用失败:', error);
+        const highlightedText = this.highlightKeyword(message.message, keyword);
+        resultContent.innerHTML = highlightedText;
+      }
+    } else {
+      // 降级处理：如果渲染器不可用，使用简单的高亮
+      const highlightedText = this.highlightKeyword(message.message, keyword);
+      resultContent.innerHTML = highlightedText;
+    }
+
+    // 创建查看按钮
+    const viewButton = document.createElement('button');
+    viewButton.className = 'btn-link';
+    viewButton.textContent = '查看完整对话';
+    viewButton.onclick = () => this.viewSession(message.sessionId);
+
+    // 组装完整的搜索结果项
+    item.appendChild(resultHeader);
+    item.appendChild(resultContent);
+    item.appendChild(viewButton);
 
     return item;
   }
 
   /**
-   * 高亮关键词
+   * 高亮关键词（纯文本）
    */
   highlightKeyword(text, keyword) {
     const escapedText = this.escapeHtml(text);
     const escapedKeyword = this.escapeHtml(keyword);
     const regex = new RegExp(`(${escapedKeyword})`, 'gi');
     return escapedText.replace(regex, '<mark>$1</mark>');
+  }
+
+  /**
+   * 在HTML内容中高亮关键词
+   */
+  highlightKeywordInHTML(html, keyword) {
+    if (!keyword || !html) return html;
+    
+    // 创建一个临时DOM元素来处理HTML
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = html;
+    
+    // 递归处理文本节点
+    const highlightTextNodes = (node) => {
+      if (node.nodeType === Node.TEXT_NODE) {
+        const text = node.textContent;
+        if (text.toLowerCase().includes(keyword.toLowerCase())) {
+          const escapedKeyword = this.escapeRegex(keyword);
+          const regex = new RegExp(`(${escapedKeyword})`, 'gi');
+          
+          // 使用安全的DOM操作而不是innerHTML
+          const parts = text.split(regex);
+          if (parts.length > 1) {
+            const fragment = document.createDocumentFragment();
+            
+            for (let i = 0; i < parts.length; i++) {
+              if (i % 2 === 0) {
+                // 普通文本
+                if (parts[i]) {
+                  fragment.appendChild(document.createTextNode(parts[i]));
+                }
+              } else {
+                // 匹配的关键词
+                const mark = document.createElement('mark');
+                mark.textContent = parts[i];
+                fragment.appendChild(mark);
+              }
+            }
+            
+            node.parentNode.replaceChild(fragment, node);
+          }
+        }
+      } else if (node.nodeType === Node.ELEMENT_NODE && node.tagName !== 'MARK') {
+        // 递归处理子节点（跳过已经高亮的mark标签）
+        const children = Array.from(node.childNodes);
+        children.forEach(child => highlightTextNodes(child));
+      }
+    };
+    
+    highlightTextNodes(tempDiv);
+    return tempDiv.innerHTML;
+  }
+
+  /**
+   * 转义正则表达式特殊字符
+   */
+  escapeRegex(string) {
+    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   }
 
   /**
