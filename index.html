@@ -2,10 +2,12 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>AI数字人</title>
   <link rel="icon" type="image/png" href="./favicon.png">
   <link rel="stylesheet" href="./css/style.css">
   <link rel="stylesheet" href="./css/chatHistory.css">
+  <link rel="stylesheet" href="./css/mobile-optimized.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   
   <!-- 富文本渲染依赖库 -->
@@ -90,6 +92,29 @@
   <div id="mainApp" class="main-app" style="display: none;">
   <!-- 左侧人物头像（悬浮在背景上） -->
   <div class="left-panel">
+    <!-- 手机端工具栏（仅在手机端显示） -->
+    <div class="toolbar mobile-toolbar">
+      <div class="toolbar-left">
+        <button id="newChatBtnMobile" title="新对话" aria-label="新对话">
+          <i class="fa-solid fa-plus" aria-hidden="true"></i>
+        </button>
+        <button id="historyBtnMobile" title="聊天记录" aria-label="聊天记录">
+          <i class="fa-solid fa-history" aria-hidden="true"></i>
+        </button>
+      </div>
+      <div class="toolbar-center">
+        <span class="mobile-character-name" id="mobileCharacterName">角色名称</span>
+      </div>
+      <div class="toolbar-right">
+        <button id="themeToggleBtnMobile" title="切换主题" aria-label="切换主题">
+          <i class="fa-solid fa-sun" aria-hidden="true"></i>
+        </button>
+        <button id="settingsBtnMobile" title="设置" aria-label="设置">
+          <i class="fa-solid fa-gear" aria-hidden="true"></i>
+        </button>
+      </div>
+    </div>
+    
     <!-- 角色名称（固定在顶部） -->
     <div class="character-name-fixed" id="characterName">角色名称</div>
     

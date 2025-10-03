@@ -341,6 +341,37 @@ class ChatUIManager {
             });
         }
 
+        // 手机端工具栏按钮事件绑定
+        const newChatBtnMobile = document.getElementById('newChatBtnMobile');
+        if (newChatBtnMobile) {
+            newChatBtnMobile.addEventListener('click', () => {
+                this.startNewChat();
+            });
+        }
+
+        const historyBtnMobile = document.getElementById('historyBtnMobile');
+        if (historyBtnMobile) {
+            historyBtnMobile.addEventListener('click', () => {
+                if (window.chatHistoryUI) {
+                    window.chatHistoryUI.show();
+                }
+            });
+        }
+
+        const themeToggleBtnMobile = document.getElementById('themeToggleBtnMobile');
+        if (themeToggleBtnMobile) {
+            themeToggleBtnMobile.addEventListener('click', () => {
+                this.toggleTheme();
+            });
+        }
+
+        const settingsBtnMobile = document.getElementById('settingsBtnMobile');
+        if (settingsBtnMobile) {
+            settingsBtnMobile.addEventListener('click', () => {
+                this.showSettings();
+            });
+        }
+
         // 媒体大小滑块
         const mediaSizeSlider = document.getElementById('mediaSizeSlider');
         const sizeValue = document.getElementById('sizeValue');
@@ -696,8 +727,14 @@ ${roleMessage}` : systemMessage;
     // 更新角色名称显示
     updateCharacterName(persona) {
         const characterNameElement = document.getElementById('characterName');
+        const mobileCharacterNameElement = document.getElementById('mobileCharacterName');
+        const name = persona.name || '未知角色';
+        
         if (characterNameElement) {
-            characterNameElement.textContent = persona.name || '未知角色';
+            characterNameElement.textContent = name;
+        }
+        if (mobileCharacterNameElement) {
+            mobileCharacterNameElement.textContent = name;
         }
     }
 

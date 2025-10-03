@@ -224,7 +224,7 @@ body.light-mode .loading-status {
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 60px 0; /* 为顶部和底部的固定元素留出空间 */
+  padding: 120px 0 140px 0; /* 顶部为角色名称留空间，底部为滑块留更多空间 */
 }
 
 /* 媒体大小控制器样式（固定在底部） */
@@ -1048,6 +1048,48 @@ body.light-mode #historyBtn:hover {
   background: rgba(0, 0, 0, 0.1);
 }
 
+/* 明亮模式下手机端工具栏背景 */
+@media (max-width: 767px) {
+  body.light-mode .left-panel .mobile-toolbar {
+    background: rgba(255, 255, 255, 0.8);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+  }
+  
+  body.light-mode .mobile-character-name {
+    color: #111;
+  }
+}
+
+/* 手机端工具栏按钮样式 */
+@media (max-width: 767px) {
+  .left-panel .mobile-toolbar button {
+    width: 36px;
+    height: 36px;
+    font-size: 14px;
+    border: none;
+    border-radius: 8px;
+    background: transparent;
+    color: #fff;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .left-panel .mobile-toolbar button:hover {
+    background: rgba(255, 255, 255, 0.1);
+  }
+  
+  body.light-mode .left-panel .mobile-toolbar button {
+    color: #111;
+  }
+  
+  body.light-mode .left-panel .mobile-toolbar button:hover {
+    background: rgba(0, 0, 0, 0.1);
+  }
+}
+
 /* === 富文本渲染样式 === */
 
 /* 富文本容器 */
@@ -1824,7 +1866,143 @@ body.light-mode .input-box button.stop-btn:hover {
     inset 0 1px 0 rgba(255, 255, 255, 0.4);
 }
 
-@media (max-width: 768px) {
+/* === 手机端响应式 (小于768px) === */
+@media (max-width: 767px) {
+  body {
+    font-size: 14px;
+  }
+  
+  .main-app {
+    flex-direction: column;
+  }
+  
+  .left-panel {
+    flex: 0 0 35%;
+    width: 100%;
+    padding: 12px;
+    position: relative;
+  }
+  
+  /* 手机端隐藏角色名称 */
+  .character-name-fixed {
+    display: none;
+  }
+  
+  /* 手机端显示左侧工具栏，隐藏右侧工具栏 */
+  .left-panel .mobile-toolbar {
+    display: flex;
+    position: fixed;
+    top: 12px;
+    left: 8px;
+    right: 8px;
+    z-index: 10;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 12px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 8px 12px;
+    gap: 8px;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  /* 工具栏中间的角色名称 */
+  .mobile-toolbar .toolbar-center {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-width: 0;
+  }
+  
+  .mobile-character-name {
+    color: #fff;
+    font-size: 14px;
+    font-weight: 500;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 120px;
+    letter-spacing: 0.1em;
+  }
+  
+  .chat-panel .toolbar {
+    display: none;
+  }
+  
+  .media-wrapper {
+    padding: 60px 0 20px 0; /* 增加顶部padding为工具栏留空间 */
+  }
+  
+  .left-panel .media-container {
+    width: 70%;
+    max-width: 250px;
+  }
+  
+  /* 手机端隐藏媒体大小调节滑块 */
+  .size-control-fixed {
+    display: none;
+  }
+  
+  .chat-panel {
+    flex: 1;
+    width: 100%;
+  }
+  
+  /* 手机端工具栏样式调整 */
+  .toolbar {
+    padding: 8px 12px;
+    gap: 8px;
+    margin: 0; /* 重置margin */
+  }
+  
+  .toolbar button {
+    width: 36px;
+    height: 36px;
+    font-size: 14px;
+  }
+  
+  .messages {
+    padding: 12px;
+    gap: 12px;
+  }
+  
+  .message {
+    gap: 8px;
+  }
+  
+  .message img,
+  .message .avatar {
+    width: 36px;
+    height: 36px;
+    font-size: 16px;
+  }
+  
+  .bubble {
+    padding: 8px 12px;
+    border-radius: 10px;
+    max-width: 80%;
+    font-size: 14px;
+  }
+  
+  .input-box {
+    padding: 12px;
+    gap: 10px;
+  }
+  
+  .input-box textarea {
+    padding: 12px 16px;
+    font-size: 16px; /* 防止iOS缩放 */
+    border-radius: 20px;
+  }
+  
+  .input-box button {
+    width: 44px;
+    height: 44px;
+    font-size: 16px;
+  }
+  
   .rich-content {
     font-size: 14px;
   }
@@ -1846,8 +2024,225 @@ body.light-mode .input-box button.stop-btn:hover {
   .scroll-to-bottom {
     width: 44px;
     height: 44px;
-    bottom: 16px;
-    right: 16px;
+    bottom: 70px;
     font-size: 16px;
+  }
+  
+  /* 代码块工具栏手机端优化 */
+  .code-block-toolbar {
+    padding: 8px 10px;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  
+  .code-block-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    min-height: 36px;
+  }
+  
+  .code-language-label {
+    padding: 4px 8px;
+    font-size: 11px;
+  }
+  
+  /* 设置界面手机端优化 */
+  .settings-header {
+    padding: 12px 16px;
+    font-size: 1.1rem;
+  }
+  
+  .settings-content {
+    padding: 16px;
+  }
+  
+  .settings-content .form-group {
+    margin-bottom: 20px;
+  }
+  
+  .settings-content label {
+    font-size: 14px;
+  }
+  
+  .settings-content select,
+  .settings-content input[type="password"] {
+    padding: 12px;
+    font-size: 14px;
+  }
+  
+  .settings-content .btn-primary,
+  .settings-content .btn-secondary {
+    padding: 10px 20px;
+    font-size: 14px;
+    min-height: 40px;
+  }
+  
+  /* 聊天记录手机端优化 */
+  .history-header {
+    padding: 12px 16px;
+  }
+  
+  .header-left h2 {
+    font-size: 1.1rem;
+  }
+  
+  .btn-icon {
+    padding: 8px;
+    font-size: 16px;
+    min-width: 36px;
+    min-height: 36px;
+  }
+  
+  .btn-primary {
+    padding: 8px 16px;
+    font-size: 14px;
+    min-height: 36px;
+  }
+  
+  .history-content {
+    padding: 12px;
+  }
+  
+  .session-item {
+    padding: 12px;
+    border-radius: 10px;
+  }
+  
+  .session-preview {
+    font-size: 14px;
+  }
+  
+  .session-meta {
+    font-size: 12px;
+    gap: 8px;
+  }
+  
+  .message-item {
+    padding: 12px;
+    gap: 8px;
+    border-radius: 10px;
+  }
+  
+  .message-avatar {
+    width: 36px;
+    height: 36px;
+    font-size: 16px;
+  }
+  
+  .message-text {
+    font-size: 14px;
+  }
+  
+  /* 搜索界面手机端优化 */
+  .search-container {
+    margin: 1rem auto 0;
+    padding: 0 12px;
+  }
+  
+  .search-input-group {
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .search-input-group input {
+    padding: 12px 16px;
+    font-size: 16px;
+    border-radius: 20px;
+  }
+  
+  .search-input-group .btn-primary {
+    width: 44px;
+    height: 44px;
+    align-self: center;
+    font-size: 16px;
+  }
+  
+  /* 代码预览模态框手机端优化 */
+  .code-preview-content {
+    width: 95%;
+    max-width: none;
+    max-height: 90%;
+    margin: 20px 10px;
+  }
+  
+  .code-preview-header {
+    padding: 12px 16px;
+  }
+  
+  .code-preview-header h3 {
+    font-size: 16px;
+  }
+  
+  .code-preview-close {
+    font-size: 18px;
+    padding: 8px;
+    min-width: 36px;
+    min-height: 36px;
+  }
+  
+  .code-preview-body {
+    padding: 16px;
+  }
+  
+  .code-display {
+    padding: 12px;
+    font-size: 13px;
+  }
+  
+  .css-preview-container {
+    min-height: 250px;
+    max-height: 400px;
+  }
+  
+  .css-preview-content {
+    padding: 16px;
+  }
+}
+
+/* 非手机端隐藏左侧工具栏 */
+@media (min-width: 768px) {
+  .left-panel .mobile-toolbar {
+    display: none;
+  }
+  
+  .chat-panel .toolbar {
+    display: flex;
+  }
+}
+
+/* === 超小屏幕优化 (小于480px) === */
+@media (max-width: 479px) {
+  /* 角色名称和大小控制器在手机端已隐藏，无需额外设置 */
+  
+  .left-panel .media-container {
+    width: 80%;
+  }
+  
+  .bubble {
+    max-width: 85%;
+    font-size: 13px;
+  }
+  
+  .toolbar button {
+    width: 32px;
+    height: 32px;
+    font-size: 13px;
+  }
+  
+  .input-box textarea {
+    font-size: 16px; /* 保持16px防止iOS缩放 */
+  }
+  
+  .input-box button {
+    width: 40px;
+    height: 40px;
+    font-size: 15px;
+  }
+  
+  .scroll-to-bottom {
+    width: 40px;
+    height: 40px;
+    bottom: 65px;
+    font-size: 15px;
   }
 }
