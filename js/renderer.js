@@ -419,21 +419,12 @@ class MessageRenderer {
      * 渲染HTML预览
      */
     renderHTMLPreview(htmlCode) {
-        // 使用shadow DOM或者安全的iframe方式
+        // 直接使用iframe进行HTML预览
         const previewId = `html-preview-${Date.now()}`;
         
         setTimeout(() => {
-            const container = document.getElementById(previewId);
-            if (container) {
-                // 创建一个安全的iframe
-                const iframe = document.createElement('iframe');
-                iframe.style.width = '100%';
-                iframe.style.height = '100%';
-                iframe.style.border = 'none';
-                iframe.style.backgroundColor = '#fff';
-                
-                container.appendChild(iframe);
-                
+            const iframe = document.getElementById(previewId);
+            if (iframe) {
                 // 写入HTML内容
                 const doc = iframe.contentDocument || iframe.contentWindow.document;
                 const fullHTML = `<!DOCTYPE html>
@@ -441,6 +432,15 @@ class MessageRenderer {
 <head>
     <meta charset="UTF-8">
     <style>
+        /* 隐藏滚动条 */
+        * {
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none; /* IE 和 Edge */
+        }
+        *::-webkit-scrollbar {
+            display: none; /* Chrome, Safari, Opera */
+        }
+        
         body { 
             font-family: Arial, sans-serif; 
             margin: 20px; 
@@ -462,9 +462,7 @@ class MessageRenderer {
 
         return `
             <div class="preview-section">
-                <div class="html-preview-container">
-                    <div id="${previewId}" class="html-preview-frame-container"></div>
-                </div>
+                <iframe id="${previewId}" style="width: 100%; height: 400px; border: none; background: #fff; border-radius: 4px;"></iframe>
             </div>
         `;
     }
