@@ -823,6 +823,17 @@
     align-self: center;
     font-size: 1rem;
   }
+
+  /* 修复：手机端搜索输入对齐与宽度 */
+  .search-input-group {
+    align-items: stretch;
+  }
+
+  .search-input-group input {
+    width: 100%;
+    box-sizing: border-box;
+    display: block;
+  }
   
   .search-container::before {
     top: -1rem;
