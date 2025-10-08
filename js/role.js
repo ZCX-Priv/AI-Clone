@@ -3,7 +3,7 @@
   const ROLES = [
     { 
       key: 'lyt', 
-      name: '李雅婷', 
+      name: '哈哈老师', 
       md: 'lyt.md', 
       leftMedia: './imgs/img01.jpg',  // 支持图片和视频
       mediaType: 'image',             // 'image' 或 'video'
@@ -12,7 +12,7 @@
     },
     { 
       key: 'zxw', 
-      name: '张兴旺', 
+      name: '兴旺老师', 
       md: 'zxw.md', 
       leftMedia: './imgs/img02.jpg', 
       mediaType: 'image', 
@@ -21,7 +21,7 @@
     },
     { 
       key: 'hjl', 
-      name: '何家亮', 
+      name: 'Shida Linx', 
       md: 'hjl.md', 
       leftMedia: './imgs/img03.jpg', 
       mediaType: 'image', 

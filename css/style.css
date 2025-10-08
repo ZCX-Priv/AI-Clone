@@ -1868,6 +1868,7 @@ body.light-mode .input-box button.stop-btn:hover {
 
 /* === 手机端响应式 (小于768px) === */
 @media (max-width: 767px) {
+  .desktop-chat-title { display: none !important; }
   body {
     font-size: 14px;
   }
@@ -2197,6 +2198,26 @@ body.light-mode .input-box button.stop-btn:hover {
   .css-preview-content {
     padding: 16px;
   }
+
+  /* 美化：手机端工具栏中间角色名 */
+  .mobile-character-name {
+    /* 渐变文字 + 轻微发光，仍保持可读性与性能 */
+    background: linear-gradient(90deg, #e0ecff 0%, #a8c8ff 50%, #e0ecff 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 1px 8px rgba(74, 144, 226, 0.35);
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    max-width: 160px;
+  }
+  
+  /* 明亮模式下的角色名微调，避免过亮 */
+  body.light-mode .mobile-character-name {
+    background: linear-gradient(90deg, #3a64a8 0%, #1f4b99 50%, #3a64a8 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 1px 6px rgba(0, 0, 0, 0.08);
+  }
 }
 
 /* 非手机端隐藏左侧工具栏 */
@@ -2207,6 +2228,31 @@ body.light-mode .input-box button.stop-btn:hover {
   
   .chat-panel .toolbar {
     display: flex;
+  }
+
+  /* 桌面端：工具栏中间标题样式 */
+  .chat-panel .toolbar .toolbar-center {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-width: 0;
+  }
+  .chat-panel .toolbar .desktop-chat-title {
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    color: #ccc;
+    opacity: 0.95;
+    user-select: none;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    max-width: 40%;
+  }
+  body.light-mode .chat-panel .toolbar .desktop-chat-title {
+    color: #333;
+    opacity: 0.9;
   }
 }
 
