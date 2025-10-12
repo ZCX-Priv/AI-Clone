@@ -8,7 +8,7 @@
       leftMedia: './imgs/img01.jpg',  // 支持图片和视频
       mediaType: 'image',             // 'image' 或 'video'
       avatar: './avatars/avatar01.jpg',
-      greeting: '你好！我是李雅婷老师，有什么想聊的吗？'
+      greeting: '你好！我是哈哈老师，有什么想聊的吗？'
     },
     { 
       key: 'zxw', 
@@ -17,7 +17,7 @@
       leftMedia: './imgs/img02.jpg', 
       mediaType: 'image', 
       avatar: './avatars/avatar02.jpg',
-      greeting: '嗨！我是张兴旺老师，有什么问题尽管问！'
+      greeting: '嗨！我是兴旺老师，有什么问题尽管问！'
     },
     { 
       key: 'hjl', 
